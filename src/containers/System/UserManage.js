@@ -1,20 +1,86 @@
 import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
+import './userManage.scss';
+import { getAllUsers } from '../../services/userSerice';
+import ModalUser from './ModalUser';
+
 class UserManage extends Component {
 
-    state = {
+    constructor(props) {
+        super(props);
+        this.state = {
+            arrUsers: [],
+            isOpenModalUser: false
+        }
+    }
+
+    async componentDidMount() {
+        let response = await getAllUsers('ALL')
+        if (response && response.errCode === 0) {
+            this.setState({
+                arrUsers: response.users
+            })
+        }
 
     }
 
-    componentDidMount() {
-
+    handleAddNewUser = () => {
+        this.setState({
+            isOpenModalUser: true
+        })
     }
 
-
+    toggleUserModal = () => {
+        this.setState({
+            isOpenModalUser: !this.state.isOpenModalUser,
+        })
+    }
     render() {
+        let arrUsers = this.state.arrUsers;
         return (
-            <div className="text-center">Manage users</div>
+            <div className="users-container">
+                <ModalUser
+                    isOpen={this.state.isOpenModalUser}
+                    toggleUserModal={this.toggleUserModal}
+                />
+                <div className='title text-center'>manage user with Ha</div>
+                <div className='mx-1'>
+                    <button className='btn btn-primary px-3'
+                        onClick={() => this.handleAddNewUser()}
+                    ><i class="fas fa-plus"></i> Add new users</button>
+                </div>
+                <div className='user-table mt-3 mx-1'>
+                    <table id="customers">
+                        <tbody>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Address</th>
+                                <th>Phone Number</th>
+                                <th>Actons</th>
+                            </tr>
+                            {arrUsers && arrUsers.map((item, index) => {
+                                return (
+                                    <tr className='divClass' key={index}>
+                                        <td>{item.firstName}</td>
+                                        <td>{item.lastName}</td>
+                                        <td>{item.address}</td>
+                                        <td>{item.phonenumber}</td>
+                                        <td>
+                                            <button className='btn-edit'><i className="far fa-edit"></i></button>
+                                            <button className='btn-delete'><i className="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                )
+                            })
+
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div >
         );
     }
 
