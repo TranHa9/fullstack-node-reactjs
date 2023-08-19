@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import './userManage.scss';
-import { getAllUsers } from '../../services/userSerice';
+import { getAllUsers, createNewUserService } from '../../services/userSerice';
 import ModalUser from './ModalUser';
 
 class UserManage extends Component {
@@ -16,13 +16,15 @@ class UserManage extends Component {
     }
 
     async componentDidMount() {
+        await this.getAllUsersFromReact();
+    }
+    getAllUsersFromReact = async () => {
         let response = await getAllUsers('ALL')
         if (response && response.errCode === 0) {
             this.setState({
                 arrUsers: response.users
             })
         }
-
     }
 
     handleAddNewUser = () => {
@@ -36,6 +38,28 @@ class UserManage extends Component {
             isOpenModalUser: !this.state.isOpenModalUser,
         })
     }
+    createNewUser = async (data) => {
+        this.setState({
+            errMessage: ""
+        })
+        try {
+            let response = await createNewUserService(data);
+            if (response && response.errCode !== 0) {
+                this.setState({
+                    errMessage: response.errMessage
+                })
+                //console.log("check err", response.errMessage)
+            } else {
+                await this.getAllUsersFromReact();
+                this.setState({
+                    isOpenModalUser: false
+                })
+            }
+        } catch (e) {
+            console.log(e);
+        }
+
+    }
     render() {
         let arrUsers = this.state.arrUsers;
         return (
@@ -43,12 +67,14 @@ class UserManage extends Component {
                 <ModalUser
                     isOpen={this.state.isOpenModalUser}
                     toggleUserModal={this.toggleUserModal}
+                    createNewUser={this.createNewUser}
+                    errMessage={this.state.errMessage}
                 />
                 <div className='title text-center'>manage user with Ha</div>
                 <div className='mx-1'>
                     <button className='btn btn-primary px-3'
                         onClick={() => this.handleAddNewUser()}
-                    ><i class="fas fa-plus"></i> Add new users</button>
+                    ><i className="fas fa-plus"></i> Add new users</button>
                 </div>
                 <div className='user-table mt-3 mx-1'>
                     <table id="customers">

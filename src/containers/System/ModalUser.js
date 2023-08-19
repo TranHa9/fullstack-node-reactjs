@@ -9,7 +9,14 @@ class ModalUser extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+            email: '',
+            password: '',
+            firstName: '',
+            lastName: '',
+            address: '',
+            phonenumber: '',
+            gender: '',
+            roleId: '',
         }
     }
 
@@ -18,6 +25,61 @@ class ModalUser extends Component {
 
     toggle = () => {
         this.props.toggleUserModal()
+    }
+
+    handleOnchangeInput = (event, id) => {
+        // let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        // if (re.test(event.target.value)) {
+        //     this.setState({
+        //         errMessage: ""
+        //     })
+        // }
+        // else {
+        //     this.setState({
+        //         errMessage: "email is invalid"
+        //     })
+        // }
+        //bad code
+        // this.state[id] = event.target.value
+        // this.setState({
+        //     ...this.state
+        // }, () => {
+        //     console.log('check bad code', this.state)
+        // })
+        //good code
+        let copyState = { ...this.state };
+        copyState[id] = event.target.value;
+        this.setState({
+            ...copyState
+        })
+    }
+
+    checkValideInput = () => {
+        this.setState({
+            errMessage: ""
+        })
+        let isValid = true;
+        let arrInput = ['email', 'password', 'firstName', 'lastName', 'address', 'phonenumber', 'gender', 'roleId'];
+        for (let i = 0; i < arrInput.length; i++) {
+            if (!this.state[arrInput[i]]) {
+                isValid = false;
+                this.setState({
+                    errCode: arrInput[i],
+                    errMessage: "miss parameter: " + arrInput[i]
+                })
+                //alert('miss parameter:' + arrInput[i]);
+                break;
+            }
+        }
+        return isValid;
+    }
+    handleAddNewUser = async () => {
+        let isValid = this.checkValideInput();
+
+        if (isValid === true) {
+            this.props.createNewUser(this.state)
+        }
     }
 
     render() {
@@ -33,48 +95,115 @@ class ModalUser extends Component {
                     <div className='modal-user-body'>
                         <div className='input-container'>
                             <label>Email:</label>
-                            <input type='text' />
+                            <input type='email'
+                                // onChange={(event) => this.handleOnchangeEmail(event)}
+                                onChange={(event) => this.handleOnchangeInput(event, "email")}
+                                value={this.state.email}
+                            />
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+
+                                    this.state.errCode === "email" ? this.state.errMessage : ''
+                                }
+                                {this.props.errMessage}
+                            </div>
                         </div>
+
                         <div className='input-container'>
                             <label>Password:</label>
-                            <input type='password' />
+                            <input type='password'
+                                onChange={(event) => this.handleOnchangeInput(event, "password")}
+                                value={this.state.password}
+                            />
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+                                    this.state.errCode === "password" ? this.state.errMessage : ''
+                                }
+                            </div>
                         </div>
                         <div className='input-container'>
                             <label>First Name:</label>
-                            <input type='text' />
+                            <input type='text'
+                                onChange={(event) => this.handleOnchangeInput(event, "firstName")}
+                                value={this.state.firstName}
+                            />
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+                                    this.state.errCode === "firstName" ? this.state.errMessage : ''
+                                }
+                            </div>
                         </div>
                         <div className='input-container'>
                             <label>Last Name</label>
-                            <input type='password' />
+                            <input type='text'
+                                onChange={(event) => this.handleOnchangeInput(event, "lastName")}
+                                value={this.state.lastName}
+                            />
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+                                    this.state.errCode === "lastName" ? this.state.errMessage : ''
+                                }
+                            </div>
                         </div>
                         <div className='input-container max-width-input'>
                             <label>Address:</label>
-                            <input type='password' />
+                            <input type='text'
+                                onChange={(event) => this.handleOnchangeInput(event, "address")}
+                                value={this.state.address}
+                            />
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+                                    this.state.errCode === "address" ? this.state.errMessage : ''
+                                }
+                            </div>
                         </div>
                         <div className='input-container'>
                             <label>Phone Number:</label>
-                            <input type='password' />
+                            <input type='text'
+                                onChange={(event) => this.handleOnchangeInput(event, "phonenumber")}
+                                value={this.state.phonenumber}
+                            />
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+                                    this.state.errCode === "phonenumber" ? this.state.errMessage : ''
+                                }
+                            </div>
                         </div>
                         <div className='input-container min-width-input'>
-                            <label for="inputState">Sex</label>
-                            <select name="gender">
+                            <label htmlFor="inputState">Sex</label>
+                            <select name="gender"
+                                onChange={(event) => this.handleOnchangeInput(event, "gender")}
+                            >
+                                <option value={this.state.gender}></option>
                                 <option value="1">Male</option>
                                 <option value="0">Female</option>
                             </select>
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+                                    this.state.errCode === "gender" ? this.state.errMessage : ''
+                                }
+                            </div>
                         </div>
                         <div className='input-container min-width-input'>
-                            <label for="inputZip">Role</label>
-                            <select name="roleId">
+                            <label htmlFor="inputZip">Role</label>
+                            <select name="roleId"
+                                onChange={(event) => this.handleOnchangeInput(event, "roleId")}
+                            >
+                                <option value={this.state.roleId}></option>
                                 <option value="1">Admin</option>
                                 <option value="2">Doctor</option>
                                 <option value="3">Patient</option>
                             </select>
+                            <div className='col-12' style={{ color: 'red' }}>
+                                {
+                                    this.state.errCode === "roleId" ? this.state.errMessage : ''
+                                }
+                            </div>
                         </div>
                     </div>
-
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" className='px-3' onClick={() => this.toggle()}>Save Changes</Button>{' '}
+                    <Button color="primary" className='px-3' onClick={() => this.handleAddNewUser()}>Add new</Button>{' '}
                     <Button color="secondary" className='px-3' onClick={() => this.toggle()}>Close</Button>
                 </ModalFooter>
             </Modal>
