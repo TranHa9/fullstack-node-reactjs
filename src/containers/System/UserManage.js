@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import './userManage.scss';
-import { getAllUsers, createNewUserService } from '../../services/userSerice';
+import { getAllUsers, createNewUserService, deleteUserService } from '../../services/userSerice';
 import ModalUser from './ModalUser';
+import { emitter } from '../../utils/emitter';
 
 class UserManage extends Component {
 
@@ -54,11 +55,25 @@ class UserManage extends Component {
                 this.setState({
                     isOpenModalUser: false
                 })
+
+                emitter.emit('EVENT_CLEAR_MODAL_DATA')
             }
         } catch (e) {
             console.log(e);
         }
 
+    }
+    handleDeleteUser = async (user) => {
+        try {
+            let res = await deleteUserService(user.id)
+            if (res && res.errCode === 0) {
+                await this.getAllUsersFromReact();
+            } else {
+                alert(res.errMessage)
+            }
+        } catch (e) {
+            console.log(e)
+        }
     }
     render() {
         let arrUsers = this.state.arrUsers;
@@ -95,7 +110,9 @@ class UserManage extends Component {
                                         <td>{item.phonenumber}</td>
                                         <td>
                                             <button className='btn-edit'><i className="far fa-edit"></i></button>
-                                            <button className='btn-delete'><i className="fas fa-trash"></i></button>
+                                            <button className='btn-delete'
+                                                onClick={() => this.handleDeleteUser(item)}
+                                            ><i className="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
                                 )
